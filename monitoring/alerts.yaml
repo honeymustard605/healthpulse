@@ -1,0 +1,49 @@
+groups:
+- name: healthpulse.rules
+  interval: 30s
+  rules:
+  - alert: HighErrorRate
+    expr: |
+      (
+        sum(rate(http_requests_total{job="healthpulse-api", status=~"5.."}[5m]))
+        /
+        sum(rate(http_requests_total{job="healthpulse-api"}[5m]))
+      ) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on HealthPulse API"
+      description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+  - alert: HighLatency
+    expr: |
+      histogram_quantile(0.95,
+        sum(rate(http_request_duration_seconds_bucket{job="healthpulse-api"}[5m])) by (le)
+      ) > 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High latency on HealthPulse API"
+      description: "p95 latency is {{ $value }}s"
+
+  - alert: PodCrashLooping
+    expr: |
+      rate(kube_pod_container_status_restarts_total{pod=~"healthpulse-api-.*"}[15m]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Pod is crash looping"
+      description: "Pod {{ $labels.pod }} is crash looping"
+
+  - alert: DatabaseConnectivityIssue
+    expr: |
+      healthpulse_api_database_connection_failures_total > 5
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "HealthPulse API cannot connect to database"
+      description: "{{ $value }} connection failures in the last 5 minutes"

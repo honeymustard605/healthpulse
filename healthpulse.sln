@@ -1,0 +1,36 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthPulse.Api", "src\HealthPulse.Api\HealthPulse.Api.csproj", "{16682C24-5C82-DB2F-3D95-9067F1A68C07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthPulse.Api.Tests", "src\HealthPulse.Api.Tests\HealthPulse.Api.Tests.csproj", "{812B979E-1BFE-468C-88D7-39FE4458145B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16682C24-5C82-DB2F-3D95-9067F1A68C07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16682C24-5C82-DB2F-3D95-9067F1A68C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16682C24-5C82-DB2F-3D95-9067F1A68C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16682C24-5C82-DB2F-3D95-9067F1A68C07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{812B979E-1BFE-468C-88D7-39FE4458145B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{812B979E-1BFE-468C-88D7-39FE4458145B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{812B979E-1BFE-468C-88D7-39FE4458145B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{812B979E-1BFE-468C-88D7-39FE4458145B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{16682C24-5C82-DB2F-3D95-9067F1A68C07} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{812B979E-1BFE-468C-88D7-39FE4458145B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6240F4D6-2587-4B30-B845-6531FB463C47}
+	EndGlobalSection
+EndGlobal
