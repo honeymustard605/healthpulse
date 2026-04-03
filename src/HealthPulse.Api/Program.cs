@@ -42,6 +42,13 @@ builder.Services.AddOpenTelemetry()
 
 var app = builder.Build();
 
+// Apply pending migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<HealthPulseDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -103,6 +110,18 @@ app.MapGet("/api/healthchecks/{id:int}", async (int id, HealthPulseDbContext db)
 
 app.MapPost("/api/healthchecks", async (CreateHealthCheckRequest request, HealthPulseDbContext db) =>
 {
+    var errors = new Dictionary<string, string[]>();
+
+    if (string.IsNullOrWhiteSpace(request.CheckName))
+        errors["checkName"] = ["Check name is required."];
+
+    string[] validStatuses = ["healthy", "unhealthy"];
+    if (string.IsNullOrWhiteSpace(request.Status) || !validStatuses.Contains(request.Status))
+        errors["status"] = [$"Status must be one of: {string.Join(", ", validStatuses)}."];
+
+    if (errors.Count > 0)
+        return Results.ValidationProblem(errors);
+
     var check = new HealthCheck
     {
         CheckName = request.CheckName,

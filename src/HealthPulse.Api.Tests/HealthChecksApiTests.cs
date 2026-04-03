@@ -56,6 +56,22 @@ public class HealthChecksApiTests : IClassFixture<HealthPulseWebApplicationFacto
     }
 
     [Fact]
+    public async Task CreateHealthCheck_EmptyName_Returns400()
+    {
+        var request = new { checkName = "", status = "healthy" };
+        var response = await _client.PostAsJsonAsync("/api/healthchecks", request);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateHealthCheck_InvalidStatus_Returns400()
+    {
+        var request = new { checkName = "database", status = "unknown" };
+        var response = await _client.PostAsJsonAsync("/api/healthchecks", request);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
     public async Task DeleteHealthCheck_Returns204()
     {
         var request = new { checkName = "disk", status = "unhealthy", message = "Low space" };
