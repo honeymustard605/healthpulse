@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: healthpulse-api
-  namespace: default
   labels:
     app: healthpulse-api
-    version: v1
 spec:
   replicas: 2
   selector:
@@ -15,136 +13,36 @@ spec:
     metadata:
       labels:
         app: healthpulse-api
-        version: v1
     spec:
-      serviceAccountName: healthpulse-api
       containers:
       - name: api
-        image: healthpulseacr.azurecr.io/healthpulse-api:latest
-        imagePullPolicy: Always
+        image: placeholder/healthpulse-api:latest
         ports:
         - containerPort: 8080
-          name: http
-          protocol: TCP
-        - containerPort: 443
-          name: https
-          protocol: TCP
-        
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
-        - name: ASPNETCORE_URLS
-          value: "http://+:8080"
-        - name: ConnectionStrings__DefaultConnection
+        - name: KeyVault__Uri
           valueFrom:
             secretKeyRef:
-              name: db-credentials
-              key: connection-string
-        
+              name: healthpulse-secrets
+              key: keyVaultUri
         livenessProbe:
           httpGet:
             path: /health
             port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 5
-        
+          initialDelaySeconds: 15
+          periodSeconds: 20
         readinessProbe:
           httpGet:
-            path: /api/status
+            path: /health
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
-          timeoutSeconds: 5
-        
         resources:
           requests:
-            memory: "256Mi"
+            memory: "128Mi"
             cpu: "100m"
           limits:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "500m"
-        
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-        
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
-        - name: var-run
-          mountPath: /var/run
-      
-      volumes:
-      - name: tmp
-        emptyDir: {}
-      - name: var-run
-        emptyDir: {}
-      
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-      
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - healthpulse-api
-              topologyKey: kubernetes.io/hostname
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: healthpulse-api
-  namespace: default
-  labels:
-    app: healthpulse-api
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    targetPort: 8080
-    protocol: TCP
-    name: http
-  selector:
-    app: healthpulse-api
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: healthpulse-api
-  namespace: default
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: healthpulse-api
-  minReplicas: 2
-  maxReplicas: 5
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: healthpulse-api
-  namespace: default
